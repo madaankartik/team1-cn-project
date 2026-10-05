@@ -2,19 +2,31 @@
 
 **Owner:** Arhan Alam
 
-1. Install Nginx and OpenSSL.
-2. Generate the certificate from the repository root:
+1. Use `nginx/edge-phase1.conf` as the project upstream/server block.
+2. Keep the trusted certificate and private key at these paths:
 
-```bash
-MAC2/tls/make-certs.sh
+```text
+Certificate: /opt/homebrew/etc/nginx/ssl/app.team1.test.crt
+Private key:  /opt/homebrew/etc/nginx/ssl/app.team1.test.key
 ```
 
-3. Copy the generated certificate and key to the paths configured in `nginx/edge-phase1.conf`.
-4. Install that Nginx server configuration and reload Nginx.
-5. Verify repeated HTTPS requests reach both backends:
+3. Test and restart Nginx:
+
+```bash
+sudo nginx -t
+brew services restart nginx
+```
+
+For a configuration-only reload:
+
+```bash
+sudo nginx -s reload
+```
+
+4. Verify HTTPS reaches either backend:
 
 ```bash
 curl -i https://app.team1.test/api/status
 ```
 
-Clients must trust the certificate before the final demonstration. Do not use `curl -k` in the demo.
+The expected response is `HTTP/1.1 200 OK`, a JSON payload, and either `X-Backend: A` or `X-Backend: B`. Client certificate trust is configured; do not use `curl -k`.

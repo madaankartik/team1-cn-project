@@ -131,11 +131,26 @@ curl -i http://10.7.24.251:3002/api/status
 Mac 2 is the only public edge entry point for clients. Nginx:
 
 - Accepts HTTP on `8080` and HTTPS on `443`
-- Terminates TLS for the private service domain
+- Terminates TLS for `app.team1.test`
 - Proxies requests to Backend A (`10.7.17.159:3001`) and Backend B (`10.7.24.251:3002`)
 - Load-balances repeated requests between the two backends
 
-For the final Phase 1 demonstration, make repeated HTTPS requests to the private domain and show `X-Backend: A` and `X-Backend: B` in the responses. The TLS certificate must be trusted by client machines; do not use `curl -k` in the demonstration.
+The active Nginx configuration is [`MAC2/nginx/edge-phase1.conf`](MAC2/nginx/edge-phase1.conf). It uses these certificate paths:
+
+```text
+/opt/homebrew/etc/nginx/ssl/app.team1.test.crt
+/opt/homebrew/etc/nginx/ssl/app.team1.test.key
+```
+
+Verify and restart with:
+
+```bash
+sudo nginx -t
+brew services restart nginx
+curl -i https://app.team1.test/api/status
+```
+
+For the final Phase 1 demonstration, make repeated HTTPS requests to the private domain and show `X-Backend: A` and `X-Backend: B` in the responses. Client machines trust the certificate; do not use `curl -k` in the demonstration.
 
 ## HTTP Caching
 
