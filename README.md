@@ -65,6 +65,24 @@ dig api.team1.test
 
 The final service must be accessed with its domain name rather than a backend IP address.
 
+### Verified Mac 1 DNS Setup
+
+```text
+Software: dnsmasq
+Configuration: /opt/homebrew/etc/dnsmasq.conf
+Upstream resolver: 1.1.1.1
+Port: 53
+```
+
+```bash
+sudo dnsmasq --test
+sudo brew services restart dnsmasq
+sudo lsof -nP -iTCP:53 -iUDP:53
+dig @10.7.9.180 app.team1.test
+```
+
+The verified lookup returns `10.7.19.111` from DNS server `10.7.9.180:53`.
+
 ## Run the Backends
 
 ### Backend A - Mac 3
