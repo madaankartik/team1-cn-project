@@ -6,7 +6,8 @@ From the repository root:
 
 ```bash
 cd backend-a
-python3 server.py
+npm install
+npm start
 ```
 
 Backend A listens on `0.0.0.0:3001` and returns `X-Backend: A`.

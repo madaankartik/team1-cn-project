@@ -89,7 +89,8 @@ The verified lookup returns `10.7.19.111` from DNS server `10.7.9.180:53`.
 
 ```bash
 cd backend-a
-python3 server.py
+npm install
+npm start
 ```
 
 ```text
@@ -97,7 +98,7 @@ Address: 10.7.17.159:3001
 Response header: X-Backend: A
 ```
 
-Backend A provides `GET /`, `GET /api/status`, and `GET /api/cache`.
+Backend A provides `GET /`, `GET /health`, `GET /api/status`, `GET /api/data`, `GET /api/cache`, and `POST /api/data`.
 
 ### Backend B - Mac 4
 
