@@ -52,6 +52,10 @@ The `wireshark-screenshots/` directory contains packet-level evidence for:
 | `08-tls-application-data.jpeg` | Encrypted TLS application data after handshake |
 | `09-tls-sni-app-team1.jpeg` | TLS Client Hello with SNI `app.team1.test` |
 | `10-repeat-tls-session.jpeg` | Additional HTTPS/TLS session traffic to Mac 2 |
+| `11-dns-app-two-clients.png` | `app.team1.test` resolved through Mac 1 by two clients (Mac 2 and Mac 3) |
+| `12-dns-api-team1.png` | `api.team1.test` query/response, answer `10.7.19.111` |
+| `13-tcp-full-connection-54307.png` | One connection from SYN to FIN, with a spurious retransmission and Dup ACK |
+| `14-tls-client-hello-sni-alpn.png` | TLS records only; Client Hello hex showing SNI `app.team1.test` and ALPN `h2`/`http/1.1` |
 
 ## Evidence status
 

@@ -286,6 +286,23 @@ A forwarded lookup took **40.8 ms**, while a local `team1.test` answer took **0.
 
 *Figure 4. Filter `dns` on Mac 1. Upstream queries go from 10.7.9.180 to 1.1.1.1 (UDP 64113 → 53). The Ethernet destination is `RuckusWirele_6f:38:ee`, the gateway, because 1.1.1.1 is off-subnet.*
 
+![Figure 4a: two different clients resolve app.team1.test through Mac 1](evidence/phase1/wireshark-screenshots/11-dns-app-two-clients.png)
+
+*Figure 4a. Filter `dns.qry.name == "app.team1.test"`. Two different client Macs ask Mac 1 for the service name and get the same answer.*
+
+| Frame | Time (s) | Source → Destination | Message |
+|---|---|---|---|
+| 10308 | 68.207922 | 10.7.19.111 (**Mac 2**) :51309 → 10.7.9.180 :53 | `Standard query 0xc5fe A app.team1.test` |
+| 10310 | 68.214187 | 10.7.9.180 → 10.7.19.111 | `response 0xc5fe A app.team1.test A 10.7.19.111` (6.3 ms) |
+| 10993 | 74.145166 | 10.7.17.159 (**Mac 3**) → 10.7.9.180 :53 | `Standard query 0xbe44 A app.team1.test` |
+| 10994 | 74.145472 | 10.7.9.180 → 10.7.17.159 | `response 0xbe44 A app.team1.test A 10.7.19.111` (0.31 ms) |
+
+Together with Mac 4's queries in Figure 3, this shows **three client Macs** (Mac 2, Mac 3, Mac 4) using our DNS server, more than the "at least two clients" the brief requires. Each query has its own transaction ID (`0xc5fe`, `0xbe44`) and its own ephemeral source port.
+
+![Figure 4b: DNS query and response for api.team1.test](evidence/phase1/wireshark-screenshots/12-dns-api-team1.png)
+
+*Figure 4b. Filter `dns.qry.name == "api.team1.test"`. Frame 31051 (202.767182 s): Mac 2 (UDP 52515 → 53) asks `A api.team1.test`, ID `0x70d2`. Frame 31054 (202.788440 s): Mac 1 answers `A 10.7.19.111`. The second project name also resolves to the edge, as configured in Section 4.3.*
+
 **DNS resolution vs connection.** DNS only turns a name into an IP address, over UDP/53 to Mac 1. The TCP/TLS/HTTP connection that follows goes to a **different machine** (Mac 2, TCP/443). DNS is never on the data path.
 
 ### Task C: Two simple backends (Mac 3, Mac 4)
@@ -435,10 +452,10 @@ All Wireshark captures were taken on **Mac 1** (interface `en0`), which acts as 
 
 | Layer / event | What to look for | Filter | Figure |
 |---|---|---|---|
-| DNS | query `A app.team1.test` → answer `10.7.19.111` | `dns && ip.addr == 10.7.9.180` | 2, 3 |
+| DNS | query `A app.team1.test` / `api.team1.test` → answer `10.7.19.111` | `dns.qry.name == "app.team1.test"` | 2, 3, 4a, 4b |
 | DNS forwarding | Mac 1 → 1.1.1.1 via the gateway | `dns` | 4 |
 | TCP handshake | SYN → SYN-ACK → ACK, ephemeral port → 443 | `ip.addr == 10.7.19.111 && tcp.port == 443` | 5 |
-| TLS handshake | Client Hello (SNI) → Server Hello → encrypted handshake | same | 5, 7 |
+| TLS handshake | Client Hello (SNI, ALPN) → Server Hello → encrypted handshake | `ip.addr == 10.7.19.111 && tls` | 5, 5a, 7 |
 | Encrypted data | `Application Data` records, payload unreadable | same | 5, 6 |
 | Connection close | FIN / ACK, retransmission | same | 6, 7 |
 | Reliability | Seq/Ack numbers grow by bytes sent | same | 5 |
@@ -490,6 +507,25 @@ Using the same frames in Figure 5:
 - **Handshake time:** about **114 ms** from Client Hello (5.652) to client Finished (5.766).
 - **No separate Certificate packet.** In TLS 1.3 everything after the Server Hello is encrypted, including the certificate. The certificate is inside the "Application Data" records of frames 785–786. `curl -v` on the client confirms it was received (`TLS handshake, Certificate (11)`) and verified (`SSL certificate verify ok`).
 - **What stays readable:** the SNI (`app.team1.test`), which tells nginx which certificate to present.
+
+![Figure 5a: TLS records only, with the Client Hello bytes](evidence/phase1/wireshark-screenshots/14-tls-client-hello-sni-alpn.png)
+
+*Figure 5a. Filter `ip.addr == 10.7.19.111 && tls`. Two complete HTTPS sessions (client port 54307 at 170.55 s and a second one at 303.69 s), showing TLS records only. The selected frame 25501 is the Client Hello (TCP `Src Port: 54307`, `Len: 324`).*
+
+The Client Hello is the last plaintext the client sends, and the hex pane shows exactly what it reveals:
+
+| Extension (type) | Bytes in the hex pane | Meaning |
+|---|---|---|
+| `server_name` (`00 00`) | `00 0e` + `61 70 70 2e 74 65 61 6d 31 2e 74 65 73 74` | SNI = **`app.team1.test`** (14 bytes), readable as `app.team1.test` in the ASCII column |
+| `supported_versions` (`00 2b`) | `03 04 03 03 03 02 03 01` | client offers TLS **1.3**, 1.2, 1.1, 1.0 |
+| `key_share` (`00 33`) | `00 1d 00 20` + 32 bytes | X25519 public key, so the 1.3 key exchange happens inside the first round trip |
+| `application_layer_protocol_negotiation` (`00 10`) | `02 68 32` `08 68 74 74 70 2f 31 2e 31` | ALPN = **`h2`**, **`http/1.1`**, visible as `h2 http/1.1` |
+
+Session 1 timing: Client Hello 170.553916 → client Finished (25510) 170.631796 = **78 ms** handshake. Request (25511) 170.631999 → encrypted response (25568, 288 bytes) 170.881952 = **250 ms**, which includes the edge's own round trip to a backend. The client then sends a 24-byte record (`close_notify`, 25570).
+
+![Figure 5b: the same connection 54307 from SYN to FIN](evidence/phase1/wireshark-screenshots/13-tcp-full-connection-54307.png)
+
+*Figure 5b. Filter `ip.addr == 10.7.19.111 && tcp.port == 443`, the same connection as Figure 5a, at the TCP level.* SYN (25480, 170.526122) → SYN-ACK (25499, 170.552693, **26.6 ms**) → ACK (25500). Afterwards the ACK numbers follow the same arithmetic as Figure 5: 325 → 1682 → 498 → 2256 → **2478**, where the extra 222 bytes are the HTTP response record. The client closes with FIN (25571). Wireshark also flags a **TCP Spurious Retransmission** (25532) and a **Dup ACK** (25533): the edge resent a 1448-byte segment the client already had, and the client's duplicate ACK says it is still at byte 1682. On this busy Wi-Fi, ACKs are sometimes delayed long enough that the sender's retransmission timer fires.
 - **The 58-byte record (798)** has exactly the size of a TLS 1.3 Finished message encrypted with a 32-byte SHA-256 hash: 5-byte record header + 4-byte handshake header + 32-byte hash + 1 content-type byte + 16-byte authentication tag.
 - **The two 287-byte server records (801–802)** right after the handshake are most likely the two TLS 1.3 `NewSessionTicket` messages, which the server sends so the client can resume later.
 
@@ -618,7 +654,7 @@ Each failure in Section 7 stops at a different step: the DNS faults at step 1, t
 3. Run `dig app.team1.test` and show Mac 2's IP from `SERVER: 10.7.9.180#53`.
 4. Run `curl -v https://app.team1.test/api/status` **without `-k`** and point at `SSL certificate verify ok`.
 5. Send 10 requests and show `X-Backend: A` and `X-Backend: B` alternating.
-6. Show the Wireshark DNS, TCP and TLS evidence (Figures 2–8).
+6. Show the Wireshark DNS, TCP and TLS evidence (Figures 2–8, 4a–5b).
 7. Show `Cache-Control`, `ETag` and a `304 Not Modified`.
 8. Stop Backend A and show the service continuing through Backend B. Restart A.
 9. Diagnose any fault the evaluator injects using Section 8.
@@ -639,9 +675,9 @@ All evidence is in `evidence/phase1/`. Terminal output was captured on 5 October
 | Trusted HTTPS (no `-k`) | `terminal-output/04_https_tls.txt`, `nginx-tls-verification.md`, `screenshots/mac2-https-verify-and-wrong-port.png` | ✅ |
 | Load balancing across A and B | `terminal-output/05_load_balancing.txt` | ✅ A=5, B=5 |
 | Cache-Control, ETag, 304 | `terminal-output/06_cache_304.txt` | ✅ 304 from both backends |
-| Wireshark: DNS | `wireshark-screenshots/02`, `03`, `04` | ✅ |
-| Wireshark: TCP three-way handshake | `wireshark-screenshots/05`, `07`, `10` | ✅ |
-| Wireshark: TLS handshake + encrypted data | `wireshark-screenshots/05`–`10` | ✅ |
+| Wireshark: DNS | `wireshark-screenshots/02`, `03`, `04`, `11` (two clients), `12` (`api.team1.test`) | ✅ |
+| Wireshark: TCP three-way handshake | `wireshark-screenshots/05`, `07`, `10`, `13` | ✅ |
+| Wireshark: TLS handshake + encrypted data | `wireshark-screenshots/05`–`10`, `14` (SNI/ALPN bytes) | ✅ |
 | Failure demonstrations | `terminal-output/09`, `10`, `11` | ✅ 5 faults |
 | Backend source code | `backend-a/server.js`, `backend-b/server.py` | ✅ |
 | DNS and nginx setup notes | `MAC1/`, `MAC2/` READMEs and configs | ✅ |
