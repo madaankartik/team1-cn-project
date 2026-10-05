@@ -171,10 +171,9 @@ The client only ever learns **Mac 2's IP**. nginx ends the client's TCP and TLS 
 
 ```
 README.md                  ← overview, inventory, run instructions, evidence checklist
+Phase1-Report.md           ← this report
+phase1-setup.md            ← setup order
 config/team.env            ← shared inventory: team, domain, all IPs and ports
-docs/
-  phase1-setup.md          ← setup order
-  Phase1-Report.md         ← this report
 MAC1/  README.md           ← Mac 1 guide
        dns/dnsmasq.conf    ← resolver configuration
        dns/team1.hosts     ← project A-records
@@ -216,7 +215,7 @@ The round-trip times are high and vary a lot (min 12 ms, max 395 ms) for machine
 
 **Evidence:** `evidence/phase1/terminal-output/07_ping_all_macs.txt`, `01_ping.txt`
 
-![Figure 1: background traffic on the shared Wi-Fi](../evidence/phase1/wireshark-screenshots/01-arp-tcp-overview.jpeg)
+![Figure 1: background traffic on the shared Wi-Fi](evidence/phase1/wireshark-screenshots/01-arp-tcp-overview.jpeg)
 
 *Figure 1. Unfiltered capture on Mac 1. Many unrelated hosts send ARP "Who has …?" broadcasts, DHCP requests and mDNS (`224.0.0.251`) queries, and the Ruckus access point also appears. Every Mac on this Wi-Fi shares one broadcast domain. This is why the later figures filter on our own IPs.*
 
@@ -254,7 +253,7 @@ app.team1.test.   0   IN   A   10.7.19.111
 
 **Evidence: DNS on the wire**
 
-![Figure 2: DNS query and response for app.team1.test](../evidence/phase1/wireshark-screenshots/03-dns-app-team1-response.jpeg)
+![Figure 2: DNS query and response for app.team1.test](evidence/phase1/wireshark-screenshots/03-dns-app-team1-response.jpeg)
 
 *Figure 2. Capture on Mac 1, filter `dns && ip.addr == 10.7.9.180`. The selected frame is the answer for `app.team1.test`.*
 
@@ -268,7 +267,7 @@ app.team1.test.   0   IN   A   10.7.19.111
 - The packet detail pane shows the full stack in one packet: *Ethernet II → IPv4 → UDP → DNS*.
 - In the hex pane, the answer's TTL field is `00 00 00 00` (TTL 0), followed by length `00 04` and the address bytes `0a 07 13 6f` = 10.7.19.111.
 
-![Figure 3: Mac 2 and Mac 4 use Mac 1, which forwards non-team names](../evidence/phase1/wireshark-screenshots/02-dns-traffic-mac1-filter.jpeg)
+![Figure 3: Mac 2 and Mac 4 use Mac 1, which forwards non-team names](evidence/phase1/wireshark-screenshots/02-dns-traffic-mac1-filter.jpeg)
 
 *Figure 3. Same filter, later in the capture. Both Mac 2 (10.7.19.111) and Mac 4 (10.7.24.251) send their queries to Mac 1, so both are configured clients.*
 
@@ -283,7 +282,7 @@ Forwarding of a non-team name, from the frames above:
 
 A forwarded lookup took **40.8 ms**, while a local `team1.test` answer took **0.58 ms**. The difference is the round trip to the internet resolver.
 
-![Figure 4: Mac 1 forwarding to 1.1.1.1 through the gateway](../evidence/phase1/wireshark-screenshots/04-dns-upstream-queries.jpeg)
+![Figure 4: Mac 1 forwarding to 1.1.1.1 through the gateway](evidence/phase1/wireshark-screenshots/04-dns-upstream-queries.jpeg)
 
 *Figure 4. Filter `dns` on Mac 1. Upstream queries go from 10.7.9.180 to 1.1.1.1 (UDP 64113 → 53). The Ethernet destination is `RuckusWirele_6f:38:ee`, the gateway, because 1.1.1.1 is off-subnet.*
 
@@ -446,7 +445,7 @@ All Wireshark captures were taken on **Mac 1** (interface `en0`), which acts as 
 
 #### G.1 TCP three-way handshake (Transport layer)
 
-![Figure 5: TCP handshake and TLS handshake to the edge on port 443](../evidence/phase1/wireshark-screenshots/05-tcp-handshake-443.jpeg)
+![Figure 5: TCP handshake and TLS handshake to the edge on port 443](evidence/phase1/wireshark-screenshots/05-tcp-handshake-443.jpeg)
 
 *Figure 5. Filter `ip.addr == 10.7.19.111 && tcp.port == 443`. One complete HTTPS connection from Mac 1 (`10.7.9.180:53986`) to the edge (`10.7.19.111:443`).*
 
@@ -496,7 +495,7 @@ Using the same frames in Figure 5:
 
 #### G.3 HTTP is encrypted on the wire
 
-![Figure 6: encrypted application data and connection lifetime](../evidence/phase1/wireshark-screenshots/06-tcp-tls-session-443.jpeg)
+![Figure 6: encrypted application data and connection lifetime](evidence/phase1/wireshark-screenshots/06-tcp-tls-session-443.jpeg)
 
 *Figure 6. The same connection over time. After the handshake, every record is "Application Data", so Wireshark cannot see the method, path or headers. The IP addresses, ports and TCP flags stay visible because the network needs them to deliver the packets. At 44 s there is a TCP Keep-Alive. At 66 s the client sends a 24-byte record (TLS `close_notify`) and FIN, and the edge answers with RST.*
 
@@ -504,7 +503,7 @@ The HTTP headers (`X-Backend`, `Cache-Control`, `ETag`, `HTTP/1.1 200`) are visi
 
 #### G.4 One full request lifecycle, retransmission, and connection close
 
-![Figure 7: one HTTPS request from open to close, with a retransmission](../evidence/phase1/wireshark-screenshots/07-tls-session-retransmission-view.jpeg)
+![Figure 7: one HTTPS request from open to close, with a retransmission](evidence/phase1/wireshark-screenshots/07-tls-session-retransmission-view.jpeg)
 
 *Figure 7. Connection `10.7.9.180:53997 → 10.7.19.111:443`.*
 
@@ -524,7 +523,7 @@ The two segments arrived out of order on the Wi-Fi. TCP's duplicate ACK and retr
 
 #### G.5 Each request is a new connection
 
-![Figure 8: consecutive connections use new ephemeral ports](../evidence/phase1/wireshark-screenshots/10-repeat-tls-session.jpeg)
+![Figure 8: consecutive connections use new ephemeral ports](evidence/phase1/wireshark-screenshots/10-repeat-tls-session.jpeg)
 
 *Figure 8. Connection 53999 closes (FIN/ACK in both directions, frames 22535–22539), and the next request opens a new connection from port **54000** (SYN at frame 22540).*
 

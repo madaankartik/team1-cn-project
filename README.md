@@ -184,20 +184,21 @@ Before the Phase 1 review, record the actual `Cache-Control` value and demonstra
 ## Repository Structure
 
 ```text
-MAC1/       Private DNS configuration and Mac 1 guide
-MAC2/       Nginx TLS/load-balancer configuration and Mac 2 guide
-MAC3/       Backend A owner guide
-MAC4/       Backend B owner and test-client guide
-backend-a/  Runnable Backend A source code
-backend-b/  Runnable Backend B source code
-config/     Shared Team 1 network inventory
-docs/       Phase 1 setup order and evidence checklist
-evidence/   Folder for screenshots and packet captures
+Phase1-Report.md  Full Phase 1 project report
+phase1-setup.md   Phase 1 setup order and evidence checklist
+MAC1/             Private DNS configuration and Mac 1 guide
+MAC2/             Nginx TLS/load-balancer configuration and Mac 2 guide
+MAC3/             Backend A owner guide
+MAC4/             Backend B owner and test-client guide
+backend-a/        Runnable Backend A source code
+backend-b/        Runnable Backend B source code
+config/           Shared Team 1 network inventory
+evidence/         Folder for screenshots and packet captures
 ```
 
-The full Phase 1 report is [`docs/Phase1-Report.md`](docs/Phase1-Report.md).
+The full Phase 1 report is [`Phase1-Report.md`](Phase1-Report.md).
 
-Start with [`docs/phase1-setup.md`](docs/phase1-setup.md), then follow the README for the machine you own.
+Start with [`phase1-setup.md`](phase1-setup.md), then follow the README for the machine you own.
 
 ## Evaluator Access
 
