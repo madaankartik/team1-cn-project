@@ -72,6 +72,7 @@ Software: dnsmasq
 Configuration: /opt/homebrew/etc/dnsmasq.conf
 Upstream resolver: 1.1.1.1
 Port: 53
+Local TTL: 0 seconds
 ```
 
 ```bash
@@ -113,6 +114,8 @@ Endpoints: GET /, GET /api/status, GET /api/cache
 Response header: X-Backend: B
 ```
 
+Backend B is implemented in Python using the standard library HTTP server and is runnable with `python3 server.py`.
+
 Test Backend B locally:
 
 ```bash
@@ -136,12 +139,14 @@ Mac 2 is the only public edge entry point for clients. Nginx:
 - Proxies requests to Backend A (`10.7.17.159:3001`) and Backend B (`10.7.24.251:3002`)
 - Load-balances repeated requests between the two backends
 
-The active Nginx configuration is [`MAC2/nginx/edge-phase1.conf`](MAC2/nginx/edge-phase1.conf). It uses these certificate paths:
+The full Nginx configuration is [`MAC2/nginx/nginx.conf`](MAC2/nginx/nginx.conf). The reusable upstream/server fragment is also stored at [`MAC2/nginx/edge-phase1.conf`](MAC2/nginx/edge-phase1.conf). It uses these certificate paths:
 
 ```text
 /opt/homebrew/etc/nginx/ssl/app.team1.test.crt
 /opt/homebrew/etc/nginx/ssl/app.team1.test.key
 ```
+
+TLS certificate generation notes, the OpenSSL SAN config, and the public root CA certificate are stored in [`MAC2/tls`](MAC2/tls). Private keys are not committed.
 
 Verify and restart with:
 
@@ -156,13 +161,14 @@ For the final Phase 1 demonstration, make repeated HTTPS requests to the private
 
 ## HTTP Caching
 
-Backend B provides `GET /api/cache` for the caching requirement. Inspect the returned headers with:
+Backend A and Backend B provide `GET /api/cache` for the caching requirement. Backend A has an explicit `ETag` value of `"backend-a-v1"`, and Backend B has an explicit `ETag` value of `"backend-b-v1"`. Inspect the returned headers with:
 
 ```bash
+curl -i http://10.7.17.159:3001/api/cache
 curl -i http://10.7.24.251:3002/api/cache
 ```
 
-Before the Phase 1 review, record the actual `Cache-Control` value and demonstrate a conditional request returning `304 Not Modified` using the Backend B `ETag`.
+Before the Phase 1 review, record the actual `Cache-Control` value and demonstrate a conditional request returning `304 Not Modified` using the returned `ETag`.
 
 ## Phase 1 Evidence Checklist
 

@@ -1,0 +1,19 @@
+[req]
+default_bits = 2048
+prompt = no
+default_md = sha256
+distinguished_name = dn
+req_extensions = req_ext
+
+[dn]
+C = IN
+O = Team1 CN Project
+CN = app.team1.test
+
+[req_ext]
+subjectAltName = @alt_names
+
+[alt_names]
+DNS.1 = app.team1.test
+DNS.2 = api.team1.test
+IP.1 = 10.7.19.111

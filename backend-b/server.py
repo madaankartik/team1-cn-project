@@ -1,5 +1,6 @@
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import json
+from urllib.parse import urlparse
 
 HOST = "0.0.0.0"
 PORT = 3002
@@ -25,24 +26,28 @@ class BackendHandler(BaseHTTPRequestHandler):
         self.wfile.write(body)
 
     def do_GET(self):
+        path = urlparse(self.path).path
 
-        if self.path == "/":
+        if path == "/":
             self.send_json({
                 "message": "Backend B is running",
                 "backend": "B",
                 "status": "ok"
             })
 
-        elif self.path == "/api/status":
+        elif path == "/api/status":
             self.send_json({
                 "backend": "B",
                 "status": "ok"
             })
 
-        elif self.path == "/api/cache":
-            client_etag = self.headers.get("If-None-Match")
+        elif path == "/api/cache":
+            client_etags = [
+                value.strip().removeprefix("W/")
+                for value in self.headers.get("If-None-Match", "").split(",")
+            ]
 
-            if client_etag == CACHE_ETAG:
+            if CACHE_ETAG in client_etags or "*" in client_etags:
                 self.send_response(304)
                 self.send_header("X-Backend", "B")
                 self.send_header("ETag", CACHE_ETAG)

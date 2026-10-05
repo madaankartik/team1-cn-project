@@ -12,6 +12,7 @@ Backend B: 10.7.24.251:3002
 ```text
 Certificate: /opt/homebrew/etc/nginx/ssl/app.team1.test.crt
 Private key: /opt/homebrew/etc/nginx/ssl/app.team1.test.key
+Public CA: MAC2/tls/team1-rootCA.crt
 ```
 
 The private-key content is intentionally not stored in this repository.

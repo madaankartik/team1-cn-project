@@ -9,7 +9,7 @@ cd backend-b
 python3 server.py
 ```
 
-Backend B listens on `0.0.0.0:3002` and returns `X-Backend: B`.
+Backend B listens on `0.0.0.0:3002` and returns `X-Backend: B`. It is implemented in Python for this project.
 
 Verify:
 

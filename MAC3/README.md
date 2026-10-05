@@ -10,7 +10,7 @@ npm install
 npm start
 ```
 
-Backend A listens on `0.0.0.0:3001` and returns `X-Backend: A`.
+Backend A listens on `0.0.0.0:3001` and returns `X-Backend: A` on all routes.
 
 Verify:
 

@@ -24,4 +24,4 @@ sudo lsof -nP -iTCP:53 -iUDP:53
 dig @10.7.9.180 app.team1.test
 ```
 
-The configured upstream resolver is `1.1.1.1`. The verified DNS response is authoritative (`aa`) and returns `10.7.19.111` for `app.team1.test` on port `53`.
+The configured upstream resolver is `1.1.1.1`. The verified DNS response is authoritative (`aa`) and returns `10.7.19.111` for `app.team1.test` on port `53`. The committed config uses `local-ttl=0` to match the live Phase 1 DNS response TTL.
