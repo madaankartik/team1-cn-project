@@ -29,4 +29,4 @@ sudo nginx -s reload
 curl -i https://app.team1.test/api/status
 ```
 
-The expected response is `HTTP/1.1 200 OK`, a JSON payload, and either `X-Backend: A` or `X-Backend: B`. Client certificate trust is configured; do not use `curl -k`.
+The expected response is `HTTP/1.1 200 OK`, a JSON payload, and either `X-Backend: A` or `X-Backend: B`. Install the issuing CA certificate (or the self-signed server certificate) in each client Mac's trust store before testing; do not use `curl -k`.

@@ -24,4 +24,4 @@ brew services restart nginx
 curl -i https://app.team1.test/api/status
 ```
 
-The HTTPS test must succeed without `curl -k`, return `HTTP/1.1 200 OK`, and include `X-Backend: A` or `X-Backend: B`.
+The HTTPS test is pending successful certificate-trust verification. It must succeed without `curl -k`, return `HTTP/1.1 200 OK`, and include `X-Backend: A` or `X-Backend: B`.
