@@ -25,6 +25,7 @@ Captured from Mac 3 (`10.7.17.159`) on 5 October 2026 with `/usr/bin/curl` (macO
 | `terminal-output/07_ping_all_macs.txt` | Every Mac pings the other three with 0% packet loss |
 | `terminal-output/08_nginx_t_mac2.txt` | `nginx -t` syntax OK on Mac 2 |
 | `terminal-output/09_failure_wrong_port.txt` | Failure demo: port 9999 refused (TCP layer) while 443 works, with layer diagnosis |
+| `terminal-output/10_failure_dns.txt` | Failure demo: wrong DNS server (timeout / NXDOMAIN) and missing record, with layer diagnosis |
 | `terminal-output/06_cache_304.txt` | `Cache-Control: public, max-age=60`, ETags `"backend-a-v1"` / `"backend-b-v1"`, and `304 Not Modified` from both backends through the edge |
 
 ## Wireshark screenshots
@@ -49,5 +50,5 @@ The `wireshark-screenshots/` directory contains packet-level evidence for:
 Add screenshots or terminal outputs for the remaining final demo items when available:
 
 ```text
-failure demos: wrong DNS server, wrong DNS record, one backend stopped, both backends stopped
+failure demos: wrong DNS record (wrong IP), one backend stopped, both backends stopped
 ```

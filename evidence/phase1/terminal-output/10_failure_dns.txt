@@ -1,0 +1,41 @@
+# Failure demo: DNS. Captured from Mac 3 (10.7.17.159) on Mon Oct  5 17:11:22 IST 2026
+
+## Control: correct DNS server (Mac 1)
+$ dig @10.7.9.180 app.team1.test +short
+10.7.19.111
+(exit code 0)
+
+## Fault 1: wrong DNS server - unused LAN address (no DNS service)
+$ dig @10.7.9.99 app.team1.test +time=2 +tries=1
+
+; <<>> DiG 9.10.6 <<>> @10.7.9.99 app.team1.test +time=2 +tries=1
+; (1 server found)
+;; global options: +cmd
+;; connection timed out; no servers could be reached
+(exit code 9)
+
+## Fault 2: wrong DNS server - public resolver does not know the private .test zone
+$ dig @1.1.1.1 app.team1.test | grep -E 'status:|ANSWER:|SERVER:'
+;; ->>HEADER<<- opcode: QUERY, status: NXDOMAIN, id: 45213
+;; flags: qr rd ra ad; QUERY: 1, ANSWER: 0, AUTHORITY: 1, ADDITIONAL: 1
+;; SERVER: 1.1.1.1#53(1.1.1.1)
+(exit code 0)
+
+## Fault 3: name that has no record in the private zone
+$ dig @10.7.9.180 wrong.team1.test | grep -E 'status:|ANSWER:|SERVER:'
+;; ->>HEADER<<- opcode: QUERY, status: NXDOMAIN, id: 39209
+;; flags: qr rd ra; QUERY: 1, ANSWER: 0, AUTHORITY: 1, ADDITIONAL: 1
+;; SERVER: 10.7.9.180#53(10.7.9.180)
+(exit code 0)
+
+## Effect on the application when the name cannot be resolved
+$ /usr/bin/curl -sS -m 5 https://wrong.team1.test/api/status
+curl: (6) Could not resolve host: wrong.team1.test
+(exit code 6)
+
+## Diagnosis by layer
+- Wrong server, nothing listening: the query times out (no DNS reply at all). No IP is obtained,
+  so no TCP/TLS/HTTP traffic happens. Fix: point the client at 10.7.9.180.
+- Wrong server, public resolver: a reply arrives but NXDOMAIN, because only Mac 1 knows team1.test.
+- Missing record: Mac 1 answers NXDOMAIN (local=/team1.test/ means it never forwards that zone).
+  curl fails at name resolution (exit 6) before any connection attempt.
