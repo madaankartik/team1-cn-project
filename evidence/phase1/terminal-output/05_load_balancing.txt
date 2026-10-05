@@ -1,0 +1,33 @@
+# Captured from Mac 3 (10.7.17.159) on Mon Oct  5 17:07:10 IST 2026 - /usr/bin/curl, no -k
+
+$ for i in {1..10}; do curl -s -D - https://app.team1.test/api/status -o /dev/null | grep -i X-Backend; done
+X-Backend: B
+X-Backend: A
+X-Backend: B
+X-Backend: A
+X-Backend: B
+X-Backend: A
+X-Backend: B
+X-Backend: A
+X-Backend: B
+X-Backend: A
+
+$ curl -s https://app.team1.test/api/status   (x4, bodies)
+{"backend": "B", "status": "ok"}
+{"backend":"A","status":"online","uptime":24.907157416,"timestamp":"2026-10-05T11:37:11.684Z","success":true}
+{"backend": "B", "status": "ok"}
+{"backend":"A","status":"online","uptime":25.082833583,"timestamp":"2026-10-05T11:37:11.860Z","success":true}
+
+$ /usr/bin/curl -i http://app.team1.test:8080/api/status
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0100    32  100    32    0     0    185      0 --:--:-- --:--:-- --:--:--   186
+HTTP/1.1 200 OK
+Server: nginx/1.31.6
+Date: Mon, 05 Oct 2026 11:37:12 GMT
+Content-Type: application/json
+Content-Length: 32
+Connection: keep-alive
+X-Backend: B
+
+{"backend": "B", "status": "ok"}

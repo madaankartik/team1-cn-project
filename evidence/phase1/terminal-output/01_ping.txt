@@ -1,0 +1,35 @@
+# Captured from Mac 3 (10.7.17.159) on Mon Oct  5 17:07:00 IST 2026
+
+$ ping -c 4 10.7.9.180
+PING 10.7.9.180 (10.7.9.180): 56 data bytes
+64 bytes from 10.7.9.180: icmp_seq=0 ttl=64 time=120.731 ms
+64 bytes from 10.7.9.180: icmp_seq=1 ttl=64 time=9.193 ms
+64 bytes from 10.7.9.180: icmp_seq=2 ttl=64 time=21.251 ms
+64 bytes from 10.7.9.180: icmp_seq=3 ttl=64 time=86.276 ms
+
+--- 10.7.9.180 ping statistics ---
+4 packets transmitted, 4 packets received, 0.0% packet loss
+round-trip min/avg/max/stddev = 9.193/59.363/120.731/45.989 ms
+
+$ ping -c 4 10.7.19.111
+PING 10.7.19.111 (10.7.19.111): 56 data bytes
+64 bytes from 10.7.19.111: icmp_seq=0 ttl=64 time=104.309 ms
+64 bytes from 10.7.19.111: icmp_seq=1 ttl=64 time=10.880 ms
+64 bytes from 10.7.19.111: icmp_seq=2 ttl=64 time=52.702 ms
+64 bytes from 10.7.19.111: icmp_seq=3 ttl=64 time=177.549 ms
+
+--- 10.7.19.111 ping statistics ---
+4 packets transmitted, 4 packets received, 0.0% packet loss
+round-trip min/avg/max/stddev = 10.880/86.360/177.549/62.185 ms
+
+$ ping -c 4 10.7.24.251
+PING 10.7.24.251 (10.7.24.251): 56 data bytes
+64 bytes from 10.7.24.251: icmp_seq=0 ttl=64 time=105.479 ms
+64 bytes from 10.7.24.251: icmp_seq=1 ttl=64 time=11.021 ms
+64 bytes from 10.7.24.251: icmp_seq=2 ttl=64 time=17.603 ms
+64 bytes from 10.7.24.251: icmp_seq=3 ttl=64 time=50.726 ms
+
+--- 10.7.24.251 ping statistics ---
+4 packets transmitted, 4 packets received, 0.0% packet loss
+round-trip min/avg/max/stddev = 11.021/46.207/105.479/37.383 ms
+

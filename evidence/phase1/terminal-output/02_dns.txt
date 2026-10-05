@@ -1,0 +1,56 @@
+# Captured from Mac 3 (10.7.17.159) on Mon Oct  5 17:07:09 IST 2026
+
+$ scutil --dns | grep -m2 nameserver
+  nameserver[0] : 10.7.9.180
+  nameserver[0] : 10.7.9.180
+
+$ dig app.team1.test
+
+; <<>> DiG 9.10.6 <<>> app.team1.test
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 9341
+;; flags: qr aa rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 1
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 1232
+;; QUESTION SECTION:
+;app.team1.test.			IN	A
+
+;; ANSWER SECTION:
+app.team1.test.		0	IN	A	10.7.19.111
+
+;; Query time: 65 msec
+;; SERVER: 10.7.9.180#53(10.7.9.180)
+;; WHEN: Mon Oct 05 17:07:10 IST 2026
+;; MSG SIZE  rcvd: 59
+
+
+$ dig api.team1.test
+
+; <<>> DiG 9.10.6 <<>> api.team1.test
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 27519
+;; flags: qr aa rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 1
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 1232
+;; QUESTION SECTION:
+;api.team1.test.			IN	A
+
+;; ANSWER SECTION:
+api.team1.test.		0	IN	A	10.7.19.111
+
+;; Query time: 8 msec
+;; SERVER: 10.7.9.180#53(10.7.9.180)
+;; WHEN: Mon Oct 05 17:07:10 IST 2026
+;; MSG SIZE  rcvd: 59
+
+
+$ dig @10.7.9.180 app.team1.test +short
+10.7.19.111
+
+$ dig @10.7.9.180 api.team1.test +short
+10.7.19.111
+

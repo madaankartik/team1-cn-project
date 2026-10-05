@@ -1,0 +1,96 @@
+# Captured from Mac 3 (10.7.17.159) on Mon Oct  5 17:07:12 IST 2026 - /usr/bin/curl, no -k
+
+## Round-robin alternates A/B, so each request is repeated until both backends are shown
+
+$ /usr/bin/curl -i https://app.team1.test/api/cache
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0100    68  100    68    0     0   1149      0 --:--:-- --:--:-- --:--:--  1152
+HTTP/1.1 200 OK
+Server: nginx/1.31.6
+Date: Mon, 05 Oct 2026 11:37:12 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 68
+Connection: keep-alive
+X-Powered-By: Express
+Access-Control-Allow-Origin: *
+X-Backend: A
+Cache-Control: public, max-age=60
+ETag: "backend-a-v1"
+
+{"backend":"A","message":"This response is cacheable","status":"ok"}
+$ /usr/bin/curl -i https://app.team1.test/api/cache
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0100    73  100    73    0     0   1058      0 --:--:-- --:--:-- --:--:--  1073
+HTTP/1.1 200 OK
+Server: nginx/1.31.6
+Date: Mon, 05 Oct 2026 11:37:12 GMT
+Content-Type: application/json
+Content-Length: 73
+Connection: keep-alive
+X-Backend: B
+Cache-Control: public, max-age=60
+ETag: "backend-b-v1"
+
+{"backend": "B", "message": "This response is cacheable", "status": "ok"}
+$ /usr/bin/curl -i -H 'If-None-Match: "backend-a-v1"' https://app.team1.test/api/cache
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+HTTP/1.1 304 Not Modified
+Server: nginx/1.31.6
+Date: Mon, 05 Oct 2026 11:37:12 GMT
+Connection: keep-alive
+X-Powered-By: Express
+Access-Control-Allow-Origin: *
+X-Backend: A
+Cache-Control: public, max-age=60
+ETag: "backend-a-v1"
+
+
+$ /usr/bin/curl -i -H 'If-None-Match: "backend-a-v1"' https://app.team1.test/api/cache
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0100    73  100    73    0     0   1024      0 --:--:-- --:--:-- --:--:--  1028
+HTTP/1.1 200 OK
+Server: nginx/1.31.6
+Date: Mon, 05 Oct 2026 11:37:12 GMT
+Content-Type: application/json
+Content-Length: 73
+Connection: keep-alive
+X-Backend: B
+Cache-Control: public, max-age=60
+ETag: "backend-b-v1"
+
+{"backend": "B", "message": "This response is cacheable", "status": "ok"}
+$ /usr/bin/curl -i -H 'If-None-Match: "backend-b-v1"' https://app.team1.test/api/cache
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0100    68  100    68    0     0    475      0 --:--:-- --:--:-- --:--:--   475
+HTTP/1.1 200 OK
+Server: nginx/1.31.6
+Date: Mon, 05 Oct 2026 11:37:12 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 68
+Connection: keep-alive
+X-Powered-By: Express
+Access-Control-Allow-Origin: *
+X-Backend: A
+Cache-Control: public, max-age=60
+ETag: "backend-a-v1"
+
+{"backend":"A","message":"This response is cacheable","status":"ok"}
+$ /usr/bin/curl -i -H 'If-None-Match: "backend-b-v1"' https://app.team1.test/api/cache
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+HTTP/1.1 304 Not Modified
+Server: nginx/1.31.6
+Date: Mon, 05 Oct 2026 11:37:12 GMT
+Connection: keep-alive
+X-Backend: B
+ETag: "backend-b-v1"
+Cache-Control: public, max-age=60
+
+

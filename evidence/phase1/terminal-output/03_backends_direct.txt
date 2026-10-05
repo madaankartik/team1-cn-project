@@ -1,0 +1,31 @@
+# Captured from Mac 3 (10.7.17.159) on Mon Oct  5 17:07:10 IST 2026
+
+$ /usr/bin/curl -i http://10.7.17.159:3001/api/status
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0100   109  100   109    0     0   9519      0 --:--:-- --:--:-- --:--:--  9909
+HTTP/1.1 200 OK
+X-Powered-By: Express
+Access-Control-Allow-Origin: *
+X-Backend: A
+Cache-Control: no-store
+Content-Type: application/json; charset=utf-8
+Content-Length: 109
+ETag: W/"6d-PU6iRoGWcfp0P4t9/v1u1XDhr/k"
+Date: Mon, 05 Oct 2026 11:37:10 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"backend":"A","status":"online","uptime":23.321615125,"timestamp":"2026-10-05T11:37:10.098Z","success":true}
+$ /usr/bin/curl -i http://10.7.24.251:3002/api/status
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0100    32  100    32    0     0    648      0 --:--:-- --:--:-- --:--:--   653
+HTTP/1.0 200 OK
+Server: BaseHTTP/0.6 Python/3.13.9
+Date: Mon, 05 Oct 2026 11:37:10 GMT
+Content-Type: application/json
+Content-Length: 32
+X-Backend: B
+
+{"backend": "B", "status": "ok"}

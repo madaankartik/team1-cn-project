@@ -20,7 +20,7 @@ openssl genrsa -out /opt/homebrew/etc/nginx/ssl/team1-rootCA.key 2048
 
 openssl req -x509 -new -nodes \
   -key /opt/homebrew/etc/nginx/ssl/team1-rootCA.key \
-  -sha256 -days 365 \
+  -sha256 -days 3650 \
   -subj "/C=IN/O=Team1 CN Project/CN=Team1 Local Root CA" \
   -out /opt/homebrew/etc/nginx/ssl/team1-rootCA.crt
 
@@ -37,7 +37,7 @@ openssl x509 -req \
   -CAkey /opt/homebrew/etc/nginx/ssl/team1-rootCA.key \
   -CAcreateserial \
   -out /opt/homebrew/etc/nginx/ssl/app.team1.test.crt \
-  -days 365 -sha256 \
+  -days 825 -sha256 \
   -extensions req_ext \
   -extfile MAC2/tls/openssl-san.cnf
 ```
