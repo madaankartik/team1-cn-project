@@ -69,12 +69,17 @@ The final service must be accessed with its domain name rather than a backend IP
 
 ### Backend A - Mac 3
 
-```text
-Address: 10.7.17.159:3001
-Run command: Pending confirmation from Backend A owner
+```bash
+cd backend-a
+python3 server.py
 ```
 
-Backend A must be LAN-accessible and provide `GET /`, `GET /api/status`, and an `X-Backend: A` response header, as required for the Phase 1 load-balancing demonstration.
+```text
+Address: 10.7.17.159:3001
+Response header: X-Backend: A
+```
+
+Backend A provides `GET /`, `GET /api/status`, and `GET /api/cache`.
 
 ### Backend B - Mac 4
 
@@ -134,6 +139,22 @@ Before the Phase 1 review, record the actual `Cache-Control` value and demonstra
 - [ ] Wireshark evidence: DNS, TCP three-way handshake, TLS handshake, ports, and encrypted HTTPS data
 - [ ] HTTP cache-header evidence and cache hit or `304` demonstration
 - [ ] Required failure demonstrations: wrong DNS server, wrong DNS record, one backend stopped, both backends stopped, and wrong destination port
+
+## Repository Structure
+
+```text
+MAC1/       Private DNS configuration and Mac 1 guide
+MAC2/       Nginx TLS/load-balancer configuration and Mac 2 guide
+MAC3/       Backend A owner guide
+MAC4/       Backend B owner and test-client guide
+backend-a/  Runnable Backend A source code
+backend-b/  Runnable Backend B source code
+config/     Shared Team 1 network inventory
+docs/       Phase 1 setup order and evidence checklist
+evidence/   Folder for screenshots and packet captures
+```
+
+Start with [`docs/phase1-setup.md`](docs/phase1-setup.md), then follow the README for the machine you own.
 
 ## Evaluator Access
 

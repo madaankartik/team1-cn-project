@@ -1,0 +1,7 @@
+__pycache__/
+*.py[cod]
+tls/out/
+*.key
+*.pcap
+*.pcapng
+.DS_Store
