@@ -7,6 +7,10 @@ const PORT = 3001;
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use((req, res, next) => {
+  res.set('X-Backend', 'A');
+  next();
+});
 
 app.get('/', (req, res) => {
   res.json({
@@ -23,7 +27,6 @@ app.get('/health', (req, res) => {
 });
 
 app.get('/api/status', (req, res) => {
-  res.set('X-Backend', 'A');
   res.set('Cache-Control', 'max-age=60');
 
   res.json({
@@ -42,7 +45,6 @@ app.get('/api/data', (req, res) => {
 });
 
 app.get('/api/cache', (req, res) => {
-  res.set('X-Backend', 'A');
   res.set('Cache-Control', 'max-age=60');
 
   res.json({

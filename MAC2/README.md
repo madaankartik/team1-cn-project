@@ -30,3 +30,9 @@ curl -i https://app.team1.test/api/status
 ```
 
 The expected response is `HTTP/1.1 200 OK`, a JSON payload, and either `X-Backend: A` or `X-Backend: B`. Install the issuing CA certificate (or the self-signed server certificate) in each client Mac's trust store before testing; do not use `curl -k`.
+
+Optional HTTP edge check:
+
+```bash
+curl -i http://app.team1.test:8080/api/status
+```

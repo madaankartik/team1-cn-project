@@ -98,7 +98,7 @@ Address: 10.7.17.159:3001
 Response header: X-Backend: A
 ```
 
-Backend A provides `GET /`, `GET /health`, `GET /api/status`, `GET /api/data`, `GET /api/cache`, and `POST /api/data`.
+Backend A provides `GET /`, `GET /health`, `GET /api/status`, `GET /api/data`, `GET /api/cache`, and `POST /api/data`. All Backend A responses include `X-Backend: A`.
 
 ### Backend B - Mac 4
 
@@ -149,6 +149,7 @@ Verify and restart with:
 sudo nginx -t
 brew services restart nginx
 curl -i https://app.team1.test/api/status
+curl -i http://app.team1.test:8080/api/status
 ```
 
 For the final Phase 1 demonstration, make repeated HTTPS requests to the private domain and show `X-Backend: A` and `X-Backend: B` in the responses. Mac 4 successfully verifies the issuing `Team1 Local Root CA` through the macOS System Keychain using `/usr/bin/curl`; configure the same trust on every client used during evaluation. Do not use `curl -k` in the demonstration.
@@ -161,7 +162,7 @@ Backend B provides `GET /api/cache` for the caching requirement. Inspect the ret
 curl -i http://10.7.24.251:3002/api/cache
 ```
 
-Before the Phase 1 review, record the actual `Cache-Control` value and demonstrate a cache hit or a conditional request returning `304 Not Modified`, if supported by the endpoint.
+Before the Phase 1 review, record the actual `Cache-Control` value and demonstrate a conditional request returning `304 Not Modified` using the Backend B `ETag`.
 
 ## Phase 1 Evidence Checklist
 
