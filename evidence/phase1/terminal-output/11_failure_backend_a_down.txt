@@ -1,0 +1,48 @@
+# Failure demo: Backend A (Mac 3) stopped. Captured from Mac 3 (10.7.17.159) via https://app.team1.test (no -k), Mon Oct  5 17:15:36 IST 2026
+
+## 1. Before: both backends serve traffic
+$ for i in {1..6}; do curl -s -D - https://app.team1.test/api/status -o /dev/null | grep -iE "^HTTP|X-Backend"; done
+HTTP/1.1 200 OK X-Backend: A
+HTTP/1.1 200 OK X-Backend: B
+HTTP/1.1 200 OK X-Backend: A
+HTTP/1.1 200 OK X-Backend: B
+HTTP/1.1 200 OK X-Backend: A
+HTTP/1.1 200 OK X-Backend: B
+
+## 2. Stop Backend A on Mac 3
+$ kill <Backend A node PID>
+$ curl -i http://10.7.17.159:3001/api/status
+curl: (7) Failed to connect to 10.7.17.159 port 3001 after 1 ms: Couldn't connect to server
+
+## 3. During: service still works, every response comes from Backend B
+$ for i in {1..6}; do curl -s -D - https://app.team1.test/api/status -o /dev/null | grep -iE "^HTTP|X-Backend"; done
+HTTP/1.1 200 OK X-Backend: B
+HTTP/1.1 200 OK X-Backend: B
+HTTP/1.1 200 OK X-Backend: B
+HTTP/1.1 200 OK X-Backend: B
+HTTP/1.1 200 OK X-Backend: B
+HTTP/1.1 200 OK X-Backend: B
+
+## 4. Restore Backend A
+$ cd ~/Desktop/CN && nohup node server.js > backend-a.log 2>&1 &
+$ curl -i http://10.7.17.159:3001/api/status
+HTTP/1.1 200 OK
+X-Backend: A
+
+## 5. After: load balancing across A and B is back
+(nginx keeps a failed upstream out of rotation for fail_timeout = 10s, so this was run >10s after the restart)
+$ sleep 11; for i in {1..6}; do curl -s -D - https://app.team1.test/api/status -o /dev/null | grep -iE "^HTTP|X-Backend"; done
+HTTP/1.1 200 OK X-Backend: B
+HTTP/1.1 200 OK X-Backend: A
+HTTP/1.1 200 OK X-Backend: B
+HTTP/1.1 200 OK X-Backend: A
+HTTP/1.1 200 OK X-Backend: B
+HTTP/1.1 200 OK X-Backend: A
+
+## Diagnosis by layer
+- DNS: OK. app.team1.test still resolves to Mac 2 (10.7.19.111).
+- TCP/TLS client -> edge: OK. The connection to nginx on 443 and the certificate check are unaffected.
+- Edge -> Backend A (TCP 10.7.17.159:3001): FAILED with "Connection refused" because no process listens on 3001.
+- nginx treats that as an upstream error, retries the same request on Backend B (proxy_next_upstream
+  error timeout, the default) and marks A unavailable for fail_timeout (10s default). The client still gets 200.
+- Result: high availability. Losing one backend does not take the service down.

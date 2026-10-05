@@ -179,7 +179,7 @@ Before the Phase 1 review, record the actual `Cache-Control` value and demonstra
 - [x] Repeated requests showing both `X-Backend: A` and `X-Backend: B`
 - [x] Wireshark evidence: DNS, TCP three-way handshake, TLS handshake, ports, and encrypted HTTPS data
 - [x] HTTP cache-header evidence and cache hit or `304` demonstration
-- [ ] Required failure demonstrations: wrong DNS server, wrong DNS record, one backend stopped, both backends stopped, and wrong destination port (done: wrong port, wrong DNS server; still to do: wrong DNS record, one backend stopped, both backends stopped)
+- [x] Failure demonstration: Backend A stopped, service continues through Backend B (`evidence/phase1/terminal-output/11_failure_backend_a_down.txt`); extra: wrong port and wrong DNS server
 
 ## Repository Structure
 

@@ -26,6 +26,7 @@ Captured from Mac 3 (`10.7.17.159`) on 5 October 2026 with `/usr/bin/curl` (macO
 | `terminal-output/08_nginx_t_mac2.txt` | `nginx -t` syntax OK on Mac 2 |
 | `terminal-output/09_failure_wrong_port.txt` | Failure demo: port 9999 refused (TCP layer) while 443 works, with layer diagnosis |
 | `terminal-output/10_failure_dns.txt` | Failure demo: wrong DNS server (timeout / NXDOMAIN) and missing record, with layer diagnosis |
+| `terminal-output/11_failure_backend_a_down.txt` | Failure demo: Backend A stopped, 6/6 HTTPS requests still 200 from Backend B, A restored and load balancing resumes |
 | `terminal-output/06_cache_304.txt` | `Cache-Control: public, max-age=60`, ETags `"backend-a-v1"` / `"backend-b-v1"`, and `304 Not Modified` from both backends through the edge |
 
 ## Wireshark screenshots
@@ -45,10 +46,6 @@ The `wireshark-screenshots/` directory contains packet-level evidence for:
 | `09-tls-sni-app-team1.jpeg` | TLS Client Hello with SNI `app.team1.test` |
 | `10-repeat-tls-session.jpeg` | Additional HTTPS/TLS session traffic to Mac 2 |
 
-## Evidence still expected for final demonstration
+## Evidence status
 
-Add screenshots or terminal outputs for the remaining final demo items when available:
-
-```text
-failure demos: wrong DNS record (wrong IP), one backend stopped, both backends stopped
-```
+All Phase 1 evidence items are captured.
