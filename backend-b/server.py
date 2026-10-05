@@ -1,46 +1,85 @@
-#!/usr/bin/env python3
-import hashlib
-import json
-import socket
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+import json
 
-BACKEND = "B"
+HOST = "0.0.0.0"
 PORT = 3002
-CACHE_BODY = json.dumps({"backend": BACKEND, "resource": "cache"}).encode()
-CACHE_ETAG = '"' + hashlib.sha256(CACHE_BODY).hexdigest()[:16] + '"'
+
+CACHE_ETAG = '"backend-b-v1"'
 
 
-class Handler(BaseHTTPRequestHandler):
-    def respond(self, status, body=b"", content_type="application/json", headers=None):
+class BackendHandler(BaseHTTPRequestHandler):
+
+    def send_json(self, data, status=200, extra_headers=None):
+        body = json.dumps(data).encode("utf-8")
+
         self.send_response(status)
-        self.send_header("X-Backend", BACKEND)
-        for name, value in (headers or {}).items():
-            self.send_header(name, value)
-        if status != 304:
-            self.send_header("Content-Type", content_type)
-            self.send_header("Content-Length", str(len(body)))
+        self.send_header("Content-Type", "application/json")
+        self.send_header("Content-Length", str(len(body)))
+        self.send_header("X-Backend", "B")
+
+        if extra_headers:
+            for name, value in extra_headers.items():
+                self.send_header(name, value)
+
         self.end_headers()
-        if body and status != 304 and self.command != "HEAD":
-            self.wfile.write(body)
+        self.wfile.write(body)
 
     def do_GET(self):
-        path = self.path.split("?", 1)[0]
-        if path == "/":
-            body = json.dumps({"backend": BACKEND, "status": "ok"}).encode()
-            self.respond(200, body, headers={"Cache-Control": "no-store"})
-        elif path == "/api/status":
-            body = json.dumps({"backend": BACKEND, "status": "ok", "host": socket.gethostname()}).encode()
-            self.respond(200, body, headers={"Cache-Control": "no-store"})
-        elif path == "/api/cache":
-            headers = {"Cache-Control": "max-age=60", "ETag": CACHE_ETAG}
-            if self.headers.get("If-None-Match") == CACHE_ETAG:
-                self.respond(304, headers=headers)
-            else:
-                self.respond(200, CACHE_BODY, headers=headers)
+
+        if self.path == "/":
+            self.send_json({
+                "message": "Backend B is running",
+                "backend": "B",
+                "status": "ok"
+            })
+
+        elif self.path == "/api/status":
+            self.send_json({
+                "backend": "B",
+                "status": "ok"
+            })
+
+        elif self.path == "/api/cache":
+            client_etag = self.headers.get("If-None-Match")
+
+            if client_etag == CACHE_ETAG:
+                self.send_response(304)
+                self.send_header("X-Backend", "B")
+                self.send_header("ETag", CACHE_ETAG)
+                self.send_header("Cache-Control", "public, max-age=60")
+                self.end_headers()
+                return
+
+            self.send_json(
+                {
+                    "backend": "B",
+                    "message": "This response is cacheable",
+                    "status": "ok"
+                },
+                extra_headers={
+                    "Cache-Control": "public, max-age=60",
+                    "ETag": CACHE_ETAG
+                }
+            )
+
         else:
-            self.respond(404, json.dumps({"error": "not found"}).encode())
+            self.send_json(
+                {
+                    "error": "Not Found",
+                    "backend": "B"
+                },
+                status=404
+            )
 
-    do_HEAD = do_GET
+    def log_message(self, format, *args):
+        print(
+            f"[Backend B] {self.address_string()} - "
+            f"{format % args}"
+        )
 
 
-ThreadingHTTPServer(("0.0.0.0", PORT), Handler).serve_forever()
+server = ThreadingHTTPServer((HOST, PORT), BackendHandler)
+
+print(f"Backend B running on {HOST}:{PORT}")
+
+server.serve_forever()
