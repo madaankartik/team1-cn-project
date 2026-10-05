@@ -1,0 +1,46 @@
+# Ping reachability from every Mac, 5 October 2026 (output pasted by each machine owner)
+# Result: every Mac reached the other three with 4/4 packets received, 0.0% packet loss.
+
+## Mac 1 (10.7.9.180, dnsmasq) -> Mac 2, Mac 3, Mac 4
+$ ping -c 4 10.7.19.111
+4 packets transmitted, 4 packets received, 0.0% packet loss
+round-trip min/avg/max/stddev = 23.999/127.922/167.419/60.129 ms
+$ ping -c 4 10.7.17.159
+4 packets transmitted, 4 packets received, 0.0% packet loss
+round-trip min/avg/max/stddev = 12.393/90.665/202.216/70.803 ms
+$ ping -c 4 10.7.24.251
+4 packets transmitted, 4 packets received, 0.0% packet loss
+round-trip min/avg/max/stddev = 92.924/185.859/326.174/97.062 ms
+
+## Mac 2 (10.7.19.111, nginx edge) -> Mac 1, Mac 3, Mac 4
+$ ping -c 4 10.7.9.180
+4 packets transmitted, 4 packets received, 0.0% packet loss
+round-trip min/avg/max/stddev = 16.625/66.010/112.630/37.555 ms
+$ ping -c 4 10.7.17.159
+4 packets transmitted, 4 packets received, 0.0% packet loss
+round-trip min/avg/max/stddev = 22.624/67.048/125.124/45.135 ms
+$ ping -c 4 10.7.24.251
+4 packets transmitted, 4 packets received, 0.0% packet loss
+round-trip min/avg/max/stddev = 93.856/170.491/239.845/54.283 ms
+
+## Mac 3 (10.7.17.159, Backend A) -> Mac 1, Mac 2, Mac 4
+$ ping -c 4 10.7.9.180
+4 packets transmitted, 4 packets received, 0.0% packet loss
+round-trip min/avg/max/stddev = 24.375/46.974/89.127/25.159 ms
+$ ping -c 4 10.7.19.111
+4 packets transmitted, 4 packets received, 0.0% packet loss
+round-trip min/avg/max/stddev = 13.357/18.785/33.567/8.542 ms
+$ ping -c 4 10.7.24.251
+4 packets transmitted, 4 packets received, 0.0% packet loss
+round-trip min/avg/max/stddev = 21.666/118.818/254.042/84.567 ms
+
+## Mac 4 (10.7.24.251, Backend B) -> Mac 1, Mac 2, Mac 3
+$ ping -c 4 10.7.9.180
+4 packets transmitted, 4 packets received, 0.0% packet loss
+round-trip min/avg/max/stddev = 33.257/243.266/394.968/131.295 ms
+$ ping -c 4 10.7.19.111
+4 packets transmitted, 4 packets received, 0.0% packet loss
+round-trip min/avg/max/stddev = 20.045/96.319/151.608/50.323 ms
+$ ping -c 4 10.7.17.159
+4 packets transmitted, 4 packets received, 0.0% packet loss
+round-trip min/avg/max/stddev = 68.587/122.453/153.665/32.506 ms

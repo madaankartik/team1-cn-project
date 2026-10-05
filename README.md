@@ -173,13 +173,13 @@ Before the Phase 1 review, record the actual `Cache-Control` value and demonstra
 ## Phase 1 Evidence Checklist
 
 - [x] Network topology diagram and IP/service inventory (Architecture section above)
-- [ ] Ping reachability between all team machines (Mac 3 -> Mac 1/2/4 captured in `evidence/phase1/terminal-output/01_ping.txt`; other Macs still to capture)
+- [x] Ping reachability between all team machines
 - [x] DNS resolution evidence for both private domains
 - [x] Trusted HTTPS access through `app.team1.test`
 - [x] Repeated requests showing both `X-Backend: A` and `X-Backend: B`
 - [x] Wireshark evidence: DNS, TCP three-way handshake, TLS handshake, ports, and encrypted HTTPS data
 - [x] HTTP cache-header evidence and cache hit or `304` demonstration
-- [ ] Required failure demonstrations: wrong DNS server, wrong DNS record, one backend stopped, both backends stopped, and wrong destination port
+- [ ] Required failure demonstrations: wrong DNS server, wrong DNS record, one backend stopped, both backends stopped, and wrong destination port (wrong port done: `evidence/phase1/terminal-output/09_failure_wrong_port.txt`)
 
 ## Repository Structure
 

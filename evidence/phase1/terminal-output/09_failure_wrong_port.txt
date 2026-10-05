@@ -1,0 +1,28 @@
+# Failure demo: wrong destination port. Captured on Mac 2, 5 October 2026 11:23 UTC
+# Screenshot: ../screenshots/mac2-https-verify-and-wrong-port.png
+
+## Control: correct port 443 works with certificate verification (no -k)
+$ curl -v https://app.team1.test:443
+* IPv4: 10.7.19.111
+* Connected to app.team1.test (10.7.19.111) port 443
+* SSL connection using TLSv1.3 / AEAD-CHACHA20-POLY1305-SHA256
+*  subjectAltName: host "app.team1.test" matched cert's "app.team1.test"
+*  issuer: C=IN; O=Team1 CN Project; CN=Team1 Local Root CA
+*  SSL certificate verify ok.
+< HTTP/1.1 200 OK
+< Server: nginx/1.31.6
+
+## Fault: wrong port 9999
+$ curl -v https://app.team1.test:9999
+* Host app.team1.test:9999 was resolved.
+* IPv4: 10.7.19.111
+*   Trying 10.7.19.111:9999...
+* connect to 10.7.19.111 port 9999 from 10.7.19.111 port 52679 failed: Connection refused
+curl: (7) Failed to connect to app.team1.test port 9999 after 4 ms: Couldn't connect to server
+
+## Diagnosis by layer
+- DNS: OK. app.team1.test still resolved to 10.7.19.111.
+- Network/IP: OK. The host is reachable (port 443 on the same IP works).
+- Transport/TCP: FAILED. Nothing listens on 9999, so the host replies with TCP RST
+  ("Connection refused"). No TLS handshake or HTTP request ever happens.
+- Fix: use the port nginx actually listens on (443 for HTTPS, 8080 for HTTP).
