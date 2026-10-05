@@ -195,6 +195,8 @@ docs/       Phase 1 setup order and evidence checklist
 evidence/   Folder for screenshots and packet captures
 ```
 
+The full Phase 1 report is [`docs/Phase1-Report.md`](docs/Phase1-Report.md).
+
 Start with [`docs/phase1-setup.md`](docs/phase1-setup.md), then follow the README for the machine you own.
 
 ## Evaluator Access

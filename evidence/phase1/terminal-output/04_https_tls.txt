@@ -57,7 +57,6 @@ $ /usr/bin/curl -v https://app.team1.test/api/status
 100   109  100   109    0     0    394      0 --:--:-- --:--:-- --:--:--   393
 * Connection #0 to host app.team1.test left intact
 {"backend":"A","status":"online","uptime":23.658171125,"timestamp":"2026-10-05T11:37:10.435Z","success":true}
-$ echo | openssl s_client -connect 10.7.19.111:443 -servername app.team1.test -CAfile MAC2/tls/team1-rootCA.crt 2>/dev/null | grep -E 'subject=|issuer=|Verify return|Protocol|Cipher is'
 $ echo | openssl s_client -connect 10.7.19.111:443 -servername app.team1.test -CAfile MAC2/tls/team1-rootCA.crt
 subject=C=IN, O=Team1 CN Project, CN=app.team1.test
 issuer=C=IN, O=Team1 CN Project, CN=Team1 Local Root CA
