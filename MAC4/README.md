@@ -17,3 +17,9 @@ Verify:
 curl -i http://10.7.24.251:3002/api/status
 curl -i http://10.7.24.251:3002/api/cache
 ```
+
+After installing `Team1 Local Root CA` in the System Keychain, verify trusted HTTPS through Nginx with:
+
+```bash
+/usr/bin/curl -i https://app.team1.test/api/status
+```

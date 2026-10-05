@@ -21,7 +21,20 @@ The private-key content is intentionally not stored in this repository.
 ```bash
 sudo nginx -t
 brew services restart nginx
-curl -i https://app.team1.test/api/status
+/usr/bin/curl -i https://app.team1.test/api/status
 ```
 
-The HTTPS test is pending successful certificate-trust verification. It must succeed without `curl -k`, return `HTTP/1.1 200 OK`, and include `X-Backend: A` or `X-Backend: B`.
+## Verified result - Mac 4
+
+Mac 4 trusts `Team1 Local Root CA` through the macOS System Keychain. The successful trusted request used the built-in macOS curl client:
+
+```text
+HTTP/1.1 200 OK
+Server: nginx/1.31.6
+Content-Type: application/json
+X-Backend: B
+
+{"backend": "B", "status": "ok"}
+```
+
+This test used neither `-k` nor `--cacert`. The Conda/Homebrew curl client may use a separate CA bundle; `/usr/bin/curl` verifies against the macOS System Keychain.

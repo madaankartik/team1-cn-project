@@ -150,7 +150,7 @@ brew services restart nginx
 curl -i https://app.team1.test/api/status
 ```
 
-For the final Phase 1 demonstration, make repeated HTTPS requests to the private domain and show `X-Backend: A` and `X-Backend: B` in the responses. Each client must trust the issuing local CA (or the self-signed certificate, if that is the chosen setup); do not use `curl -k` in the demonstration.
+For the final Phase 1 demonstration, make repeated HTTPS requests to the private domain and show `X-Backend: A` and `X-Backend: B` in the responses. Mac 4 successfully verifies the issuing `Team1 Local Root CA` through the macOS System Keychain using `/usr/bin/curl`; configure the same trust on every client used during evaluation. Do not use `curl -k` in the demonstration.
 
 ## HTTP Caching
 
